@@ -24,7 +24,8 @@ from ctypes import cast, POINTER, c_ushort
 import platform
 
 # Monkey-patch for ply.yacc defining startPush and push methods.
-from . import incremental_yacc
+#from . import incremental_yacc
+from incremental_yacc import *
 
 _DEBUG = bool(os.environ.get('ITI1480A_DEBUG'))
 PYPY = platform.python_implementation() == 'PyPy'
