@@ -5,7 +5,8 @@ import threading
 import signal
 import subprocess
 import sys
-from cStringIO import StringIO
+#from cStringIO import StringIO
+from io import StringIO
 from collections import deque
 
 # TODO: use wxWidget 2.9 wxTreeCtrl

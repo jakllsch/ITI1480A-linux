@@ -88,27 +88,27 @@ class wxITI1480AMainFrame(wx.Frame):
         # end wxGlade
 
     def onOpen(self, event):  # wxGlade: wxITI1480AMainFrame.<event_handler>
-        print "Event handler `onOpen' not implemented!"
+        print("Event handler `onOpen' not implemented!")
         event.Skip()
 
     def onSave(self, event):  # wxGlade: wxITI1480AMainFrame.<event_handler>
-        print "Event handler `onSave' not implemented!"
+        print("Event handler `onSave' not implemented!")
         event.Skip()
 
     def onExit(self, event):  # wxGlade: wxITI1480AMainFrame.<event_handler>
-        print "Event handler `onExit' not implemented!"
+        print("Event handler `onExit' not implemented!")
         event.Skip()
 
     def onStart(self, event):  # wxGlade: wxITI1480AMainFrame.<event_handler>
-        print "Event handler `onStart' not implemented!"
+        print("Event handler `onStart' not implemented!")
         event.Skip()
 
     def onPause(self, event):  # wxGlade: wxITI1480AMainFrame.<event_handler>
-        print "Event handler `onPause' not implemented!"
+        print("Event handler `onPause' not implemented!")
         event.Skip()
 
     def onStop(self, event):  # wxGlade: wxITI1480AMainFrame.<event_handler>
-        print "Event handler `onStop' not implemented!"
+        print("Event handler `onStop' not implemented!")
         event.Skip()
 
 # end of class wxITI1480AMainFrame
