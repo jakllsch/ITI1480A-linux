@@ -15,7 +15,9 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 import os
 from struct import unpack
-from cStringIO import StringIO
+#from cStringIO import StringIO
+from io import StringIO
+#from io import BytesIO as StringIO
 from ply.yacc import yacc
 from ply.lex import LexToken
 import itertools
@@ -846,7 +848,7 @@ NEED_HANDSHAKE_LIST = ('SETUP', 'IN', 'OUT')
 HANDSHAKE_LIST = ('ACK', 'NAK', 'STALL', 'NYET')
 
 class _TransactionAggregator(_BaseYaccAggregator):
-    tokens = TRANSACTION_TYPE_DICT.values() + [TOKEN_TYPE_SSPLIT, TOKEN_TYPE_CSPLIT]
+    tokens = list(TRANSACTION_TYPE_DICT.values()) + [TOKEN_TYPE_SSPLIT, TOKEN_TYPE_CSPLIT]
     _start = 'transactions'
     _error_type = MESSAGE_TRANSACTION_ERROR
 

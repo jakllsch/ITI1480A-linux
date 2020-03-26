@@ -278,11 +278,10 @@ def main():
         infile = sys.stdin
     else:
         try:
-            infile = open(options.infile, 'r')
+            infile = open(options.infile, 'r', encoding="latin-1")
         except IOError:
-            print >>sys.stderr, 'Could not open --infile %r' % (
-                options.infile,
-            )
+            print('Could not open --infile %r' % (
+                options.infile,), file=sys.stderr)
             sys.exit(1)
     if options.outfile == '-':
         write = sys.stdout.write
@@ -290,15 +289,14 @@ def main():
         try:
             write = open(options.outfile, 'w').write
         except IOError:
-            print >>sys.stderr, 'Could not open --outfile %r' % (
-                options.outfile,
-            )
+            print('Could not open --outfile %r' % (
+                options.outfile,), file=sys.stderr)
             sys.exit(1)
     if options.tee:
         try:
             raw_write = open(options.tee, 'w').write
         except IOError:
-            print >>sys.stderr, 'Could not open --tee %r' % (options.tee, )
+            print('Could not open --tee %r' % (options.tee, ), file=sys.stderr)
             sys.exit(1)
     else:
         raw_write = lambda x: None
@@ -331,7 +329,7 @@ def main():
         while True:
             try:
                 data = read(CHUNK_SIZE)
-            except IOError, exc:
+            except IOError as exc:
                 if exc.errno != errno.EAGAIN:
                     raise
                 # Using select instead of more recent alternatives, because:
@@ -351,7 +349,7 @@ def main():
             except ParsingDone:
                 break
         stream.stop()
-    except IOError, exc:
+    except IOError as exc:
         # Happens when output is piped to a pager, and pager exits before stdin
         # is fully parsed.
         if exc.errno != errno.EPIPE:

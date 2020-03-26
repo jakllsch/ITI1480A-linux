@@ -150,7 +150,7 @@ class CompliantUSBAnalyzer(BaseUSBAnalyzer):
     def _dumpList(self, offset, name_list):
         for name, value in zip(name_list, self.xpeek(offset, len(name_list))):
             if name:
-                print >>sys.stderr,'%20s: %02x' % (name, ord(value))
+                print('%20s: %02x' % (name, ord(value)), file=sys.stderr)
 
     def dumpIRQ(self):
         self._dumpList(0xe650, (
@@ -286,7 +286,7 @@ class CompliantUSBAnalyzer(BaseUSBAnalyzer):
             if name is None:
                 continue
             assert ljmp == 2, ljmp
-            print >>sys.stderr,'%20s=0x%04x' % (name, addr)
+            print('%20s=0x%04x' % (name, addr), file=sys.stderr)
 
     def peek(self, address, length=1):
         return self.readCommand(length, self.COMMAND_MEMORY, self.COMMAND_MEMORY_INTERNAL, address)
@@ -377,8 +377,8 @@ class TransferDumpCallback(object):
                             speed, suffix))
                 sys.stderr.write('Capture size: %i\r' % (cap_size, ))
         try:
-            self.write(data)
-        except IOError, exc:
+            self.write(data, flush=True)
+        except IOError as exc:
             if exc.errno != errno.EPIPE:
                 raise
             result = False
@@ -414,14 +414,14 @@ def main():
         assert len(usb_device) == 2
         usb_device = (int(usb_device[0]), int(usb_device[1]))
     if options.out is None:
-        out_file = os.fdopen(sys.stdout.fileno(), 'w', 0)
+        out_file = os.fdopen(sys.stdout.fileno(), 'w')
     else:
         out_file = open(options.out, 'wb', 0)
     verbose = options.verbose
     with usb1.USBContext() as context:
         handle = getDeviceHandle(context, VENDOR_ID, DEVICE_ID, usb_device)
         if handle is None:
-            print >>sys.stderr, 'ITI1480A USB Analyzer not found'
+            print('ITI1480A USB Analyzer not found', file=sys.stderr)
             sys.exit(1)
         handle.claimInterface(0)
         analyzer = USBAnalyzer(handle)
