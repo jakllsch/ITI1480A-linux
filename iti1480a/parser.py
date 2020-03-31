@@ -15,14 +15,11 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 import os
 from struct import unpack
-#from cStringIO import StringIO
-from io import StringIO
-#from io import BytesIO as StringIO
+from io import BytesIO as StringIO
 from ply.yacc import yacc
 from ply.lex import LexToken
 import itertools
 import sys
-from ctypes import cast, POINTER, c_ushort
 import platform
 
 # Monkey-patch for ply.yacc defining startPush and push methods.
@@ -30,9 +27,7 @@ import platform
 from incremental_yacc import *
 
 _DEBUG = bool(os.environ.get('ITI1480A_DEBUG'))
-PYPY = platform.python_implementation() == 'PyPy'
 LITTLE_ENDIAN = sys.byteorder == 'little'
-c_ushort_p = POINTER(c_ushort)
 
 class ParsingDone(Exception):
     """
@@ -288,7 +283,7 @@ _CRC16_POLYNOMIAL = _swap16(CRC16_POLYNOMIAL)
 def crc5(data):
     remainder = 0x1f
     for _, byte in data:
-        for _ in xrange(8):
+        for _ in range(8):
             xor_poly = (byte ^ remainder) & 1
             remainder >>= 1
             byte >>= 1
@@ -299,7 +294,7 @@ def crc5(data):
 def crc16(data):
     remainder = 0xffff
     for _, byte in data:
-        for _ in xrange(8):
+        for _ in range(8):
             xor_poly = (byte ^ remainder) & 1
             remainder >>= 1
             byte >>= 1
@@ -1116,7 +1111,11 @@ class Packetiser(BaseAggregator):
     def _rxcmd(self, tic, data):
         # TODO:
         # - RxError
-        rxactive = data & RXCMD_RX_ACTIVE
+        rxactive = (data & RXCMD_RX_ACTIVE) == RXCMD_RX_ACTIVE
+        rxerror  = (data & RXCMD_RX_ERROR) == RXCMD_RX_ERROR
+        if rxerror:
+            rendered = 'RX Error'
+            return
         if self._rxactive and not rxactive and self._data_list:
             self._to_next.push(self._data_list)
             self._data_list = []
@@ -1168,16 +1167,16 @@ class ReorderedStream(BaseAggregator):
             raise ValueError('data len must be even')
         out = self._out.push
         tic = self._tic
-        if LITTLE_ENDIAN and not PYPY:
-            data_short_list = cast(data, c_ushort_p)
-            reader = (data_short_list[x] for x in xrange(len(data) / 2))
+        if LITTLE_ENDIAN:
+            endianness = '>'
         else:
-            read = StringIO(data).read
-            reader = (
-                unpack('<H', read(2))[0]
-                for x in xrange(0, len(data) - 1, 2)
-            )
-        next_data = itertools.chain(self._remain, reader).next
+            endianness = '<'
+        read = StringIO(data).read
+        reader = iter(
+            unpack(endianness+'H', read(2))[0]
+            for x in range(0, len(data) - 1, 2)
+        )
+        next_data = itertools.chain(self._remain, reader).__next__
         while True:
             try:
                 p1 = next_data()
@@ -1206,6 +1205,7 @@ class ReorderedStream(BaseAggregator):
                     payload = None
             else:
                 payload = p1 & 0xff
+
             tic += tic_count
             if packet_type:
                 if payload is None:
@@ -1223,7 +1223,7 @@ class ReorderedStream(BaseAggregator):
                     payload >>= 8
                 out(tic, packet_type, payload)
             else:
-                assert payload == 0
+                assert (payload == 0) or (payload == None)
             self._tic = tic
 
     def stop(self):

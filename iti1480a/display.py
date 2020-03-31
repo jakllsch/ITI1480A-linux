@@ -108,7 +108,7 @@ class HumanReadable(object):
             time = '?'
         else:
             time = tic_to_time(tic)
-            if tic < self._last_tic:
+            if self._last_tic is None or tic < self._last_tic:
                 time = '\x1b[31m' + time + '\x1b[0m'
             else:
                 self._last_tic = tic
@@ -278,7 +278,7 @@ def main():
         infile = sys.stdin
     else:
         try:
-            infile = open(options.infile, 'r', encoding="latin-1")
+            infile = open(options.infile, 'rb')
         except IOError:
             print('Could not open --infile %r' % (
                 options.infile,), file=sys.stderr)
@@ -287,14 +287,14 @@ def main():
         write = sys.stdout.write
     else:
         try:
-            write = open(options.outfile, 'w').write
+            write = open(options.outfile, 'wb').write
         except IOError:
             print('Could not open --outfile %r' % (
                 options.outfile,), file=sys.stderr)
             sys.exit(1)
     if options.tee:
         try:
-            raw_write = open(options.tee, 'w').write
+            raw_write = open(options.tee, 'wb').write
         except IOError:
             print('Could not open --tee %r' % (options.tee, ), file=sys.stderr)
             sys.exit(1)
